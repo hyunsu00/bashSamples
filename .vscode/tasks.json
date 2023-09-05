@@ -8,10 +8,10 @@
             "type": "shell",
             "command": "bash",
             "args": ["-c", "chmod +x ${workspaceFolder}/mkdir.sh; ${workspaceFolder}/mkdir.sh"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            // "group": {
+            //     "kind": "build",
+            //     "isDefault": true
+            // }
         }
     ]
 }

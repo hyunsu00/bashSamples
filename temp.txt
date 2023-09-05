@@ -1,1 +1,0 @@
-"args": ["-c", "chmod +x ../mkdir.sh; ../mkdir.sh"],
