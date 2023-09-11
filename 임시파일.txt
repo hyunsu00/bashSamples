@@ -1,0 +1,18 @@
+# [TODO] : 디버그
+if [ -z "$FILTER_SERVER_HOME" ]; then
+    echo 'S{FILTER_SERVER_HOME}이 정의되어 있지 않아 실행에 실패하였습니다.'
+    exit -1
+fi
+
+${FILTER_SERVER_HOME}/HncDocsConverterServer_Hwp $1
+
+
+
+# 한글 첫번째 포트(`$1``)로 백그라운드(`&`)로 실행하며
+# 백그라운드 프로세스의 쉘의 소유권 제거(`disown`)
+#HNC_DIR=$PWD ${BIN_PATH}/HncDocsConverterServer_Hwp $1 & disown
+
+
+
+# 한글 첫번째 포트(`$1``)로 백그라운드(`&`)로 실행하며
+# 백그라운드 프로세스의 쉘의 소유권 제거(`disown`)

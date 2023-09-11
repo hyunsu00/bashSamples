@@ -1,0 +1,5 @@
+cd $HDV_HOME/filterserver
+
+# 한글 첫번째 포트(`$1``)로 백그라운드(`&`)로 실행하며
+# 백그라운드 프로세스의 쉘의 소유권 제거(`disown`)
+HNC_DIR=$PWD ${FILTER_SERVER_HOME}/HncDocsConverterServer_Hwp $1 & disown

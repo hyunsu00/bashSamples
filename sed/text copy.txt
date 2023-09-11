@@ -1,0 +1,3 @@
+cd $HDV_HOME/filterserver
+
+HNC_DIR=$PWD ./Bin/HncDocsConverterServer_Hwp $1 & disown
