@@ -1,1 +1,7 @@
-{}
+{
+    "code-runner.executorMap": {
+        "shellscript": "bash \"$(wslpath -a $fullFileName)\""
+        // "shellscript": "\"C:\\Program Files\\Git\\bin\\bash.exe\""
+    },
+    "code-runner.respectShebang": false,
+}
