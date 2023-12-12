@@ -12,16 +12,6 @@ get_linux_os_version() {
     echo "${result}"
 }
 
-_exe(){
-    [ $1 == on  ] && { set -x; return; } 2>/dev/null
-    [ $1 == off ] && { set +x; return; } 2>/dev/null
-    echo + "$@"
-    "$@"
-}
-exe(){
-    { _exe "$@"; } 2>/dev/null
-}
-
 main() {
     echo "[main() : begin("${BASH_SOURCE[0]}")]"
 
