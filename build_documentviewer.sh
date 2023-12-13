@@ -30,7 +30,7 @@ build() {
 
     local _PRODUCT_VERSION="${MAJOR_VERSION}.${BUILD_NUMBER}(${BUILD_DATE})"
 
-    _build_middware() {
+    _build_middleware() {
         local PRODUCT_VERSION="${_PRODUCT_VERSION}"
         local PUBLISH="${_PUBLISH}"
 
@@ -92,7 +92,18 @@ build() {
         npm run build
     }
 
-    _build_middware && _build_frontend
+    local _step="_build_middleware"
+    case "${_step}" in
+    "_build_middleware") # 미들웨어 빌드
+        _build_middleware
+        ;&
+    "_build_frontend") # 프런트엔드 빌드
+        _build_frontend
+        ;;
+    *)
+        echo "[build()] : unknown step _build"
+        ;;
+    esac
 }
 
 packaging() {
@@ -158,7 +169,7 @@ packaging() {
         cd $WORKSPACE_PATH
     }
 
-    _packaging_middware() {
+    _packaging_middleware() {
         local IS_CLI="${_IS_CLI}"
 
         local CONTENTS_SRC_HOME="${WORKSPACE_PATH}/contentsconverter"
@@ -219,7 +230,27 @@ packaging() {
         fi
     }
 
-    _packaging_clean && _packaging_filterserver && _packaging_middware && _packaging_frontend && _packaging_publish
+    local _step="_packaging_clean"
+    case "${_step}" in
+    "_packaging_clean") # 패키징 초기화
+        _packaging_clean
+        ;&
+    "_packaging_filterserver") # 필터서버 패키징
+        _packaging_filterserver
+        ;&
+    "_packaging_middleware") # 미들웨어 패키징
+        _packaging_middleware
+        ;&
+    "_packaging_frontend") # 프런트엔드 패키징
+        _packaging_frontend
+        ;&
+    "_packaging_publish") # 배포 패키징
+        _packaging_publish
+        ;;
+    *)
+        echo "[packaging()] : unknown step _packaging"
+        ;;
+    esac
 }
 
 get_package_name() {
@@ -315,7 +346,7 @@ generate_version() {
     local MAJOR_VERSION="${2}"
     local BUILD_NUMBER="${3}"
     local BUILD_DATE="${4}"
-    
+
     local BUILD_FOLDER="${BUILD_DATE}-${BUILD_NUMBER}"
     local PRODUCT_CLOUD_TARGET="/mnt/product-cloud/build/${BUILD_FOLDER}-$(get_linux_os_name).v$(get_linux_os_version)"
     local BUILD_HISTORY_TARGET="/mnt/product-cloud/build_history/${BUILD_FOLDER}-$(get_linux_os_name).v$(get_linux_os_version)"
@@ -342,30 +373,40 @@ main() {
     PS4='Line $LINENO: '
     set -ex
     {
-        # clean_all
+        local _stage="clean_all"
 
-        MAJOR_VERSION="hotfix.m17.3"
-        BUILD_NUMBER="999"
-        BUILD_DATE=$(date +%Y%m%d)
-        PUBLISH="ON"
-        # 빌드
-        build $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH
-
-        FILTERSERVER_SRC_PATH="${WORKSPACE_PATH}/../docsconverter-2021-v2-hdv-rhel92-build/build/20231208-5"
-        BUILD_FILE_NAME="hncfilterserver-11.90.0.5-Linux.tar.bz2"
-        IS_CLI="OFF"
-        # 패키징
-        packageing $FILTERSERVER_SRC_PATH $BUILD_FILE_NAME $PUBLISH $IS_CLI
-
-        # 패키지
-        TARGET_BUILD_FILE_NAME=$(get_package_name $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH $IS_CLI)
-        package $TARGET_BUILD_FILE_NAME
-
-        # 배포
-        depoly $TARGET_BUILD_FILE_NAME $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH $IS_CLI 
-
-        BRANCH_NAME="hotfix.m17.3"
-        generate_version $BRANCH_NAME $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE
+        case "${_stage}" in
+        "clean_all") # 모든것 초기화
+            clean_all
+            ;&
+        "build") # 빌드
+            MAJOR_VERSION="hotfix.m17.3"
+            BUILD_NUMBER="999"
+            BUILD_DATE=$(date +%Y%m%d)
+            PUBLISH="ON"
+            build $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH
+            ;&
+        "packaging") # 패키징
+            FILTERSERVER_SRC_PATH="${WORKSPACE_PATH}/../docsconverter-2021-v2-hdv-rhel92-build/build/20231208-5"
+            BUILD_FILE_NAME="hncfilterserver-11.90.0.5-Linux.tar.bz2"
+            IS_CLI="OFF"
+            packaging $FILTERSERVER_SRC_PATH $BUILD_FILE_NAME $PUBLISH $IS_CLI
+            ;&
+        "package") # 패키지
+            TARGET_BUILD_FILE_NAME=$(get_package_name $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH $IS_CLI)
+            package $TARGET_BUILD_FILE_NAME
+            ;&
+        "depoly") # 배포
+            depoly $TARGET_BUILD_FILE_NAME $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE $PUBLISH $IS_CLI
+            ;&
+        "generate_version") # 빌드버전 생성
+            BRANCH_NAME="hotfix.m17.3"
+            generate_version $BRANCH_NAME $MAJOR_VERSION $BUILD_NUMBER $BUILD_DATE
+            ;;
+        *)
+            echo "unknown stage"
+            ;;
+        esac
     }
     set +ex
 
